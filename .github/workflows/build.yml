@@ -13,47 +13,30 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️⃣ استرجاع cache للحزم لتسريع البناء
-      - name: Cache Flutter Pub packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            ~/.flutter
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-
-      # 3️⃣ إزالة أي Flutter cache قديمة لتجنب النسخ غير الصحيحة
-      - name: Remove old Flutter cache (optional)
+      # 2️⃣ إزالة أي Flutter موجود مسبقًا
+      - name: Remove old Flutter
         run: rm -rf $HOME/flutter
 
-      # 4️⃣ تثبيت Flutter المستقر (3.13.0) المتوافق مع Dart >=3.3
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.13.0'
-          channel: 'stable'
-
-      # 5️⃣ التحقق من النسخة
-      - name: Check Flutter & Dart version
+      # 3️⃣ تثبيت Flutter من المصدر (يتضمن Dart >=3.3)
+      - name: Install Flutter 3.13.0
         run: |
+          git clone -b 3.13.0 https://github.com/flutter/flutter.git $HOME/flutter
+          echo "$HOME/flutter/bin" >> $GITHUB_PATH
           flutter --version
-          dart --version
 
-      # 6️⃣ تنظيف أي ملفات بناء سابقة
+      # 4️⃣ تنظيف أي ملفات بناء سابقة
       - name: Flutter clean
         run: flutter clean
 
-      # 7️⃣ تثبيت الاعتمادات
+      # 5️⃣ تثبيت الاعتمادات
       - name: Install dependencies
         run: flutter pub get
 
-      # 8️⃣ بناء APK فقط
+      # 6️⃣ بناء APK فقط
       - name: Build APK
         run: flutter build apk --release
 
-      # 9️⃣ رفع الـ APK كـ artifact
+      # 7️⃣ رفع الـ APK كـ artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
