@@ -9,29 +9,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. تنزيل الكود من GitHub
+      # 1️⃣ تنزيل الكود
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2. تثبيت Flutter المتوافق مع Dart >=3.3.0
+      # 2️⃣ استرجاع cache للحزم لتسريع البناء
+      - name: Cache Flutter Pub packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.flutter
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      # 3️⃣ إزالة أي Flutter cache قديمة لتجنب النسخ غير الصحيحة
+      - name: Remove old Flutter cache (optional)
+        run: rm -rf $HOME/flutter
+
+      # 4️⃣ تثبيت Flutter المستقر (3.13.0) المتوافق مع Dart >=3.3
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0'   # Flutter 3.13 يأتي مع Dart 3.3+
+          flutter-version: '3.13.0'
+          channel: 'stable'
 
-      # 3. تنظيف أي ملفات بناء سابقة
+      # 5️⃣ التحقق من النسخة
+      - name: Check Flutter & Dart version
+        run: |
+          flutter --version
+          dart --version
+
+      # 6️⃣ تنظيف أي ملفات بناء سابقة
       - name: Flutter clean
         run: flutter clean
 
-      # 4. تثبيت الاعتمادات
+      # 7️⃣ تثبيت الاعتمادات
       - name: Install dependencies
         run: flutter pub get
 
-      # 5. بناء APK فقط
+      # 8️⃣ بناء APK فقط
       - name: Build APK
         run: flutter build apk --release
 
-      # 6. رفع الـ APK كـ artifact
+      # 9️⃣ رفع الـ APK كـ artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
