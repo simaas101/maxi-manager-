@@ -9,39 +9,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ تنزيل الكود
+      # تنزيل الكود
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️⃣ إزالة أي Flutter موجود مسبقًا
-      - name: Remove old Flutter
-        run: rm -rf $HOME/flutter
+      # تثبيت Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.0'   # غيّرها لإصدارك إذا مختلف
 
-      # 3️⃣ تثبيت Flutter 3.13.0 من GitHub
-      - name: Install Flutter 3.13.0
-        run: |
-          git clone -b 3.13.0 https://github.com/flutter/flutter.git $HOME/flutter
-          echo "$HOME/flutter/bin" >> $GITHUB_PATH
-
-      # 4️⃣ التحقق من النسخة بعد تحديث PATH
-      - name: Check Flutter & Dart version
-        run: |
-          flutter --version
-          dart --version
-
-      # 5️⃣ تنظيف أي ملفات بناء سابقة
-      - name: Flutter clean
-        run: flutter clean
-
-      # 6️⃣ تثبيت الاعتمادات
+      # تثبيت الحزم
       - name: Install dependencies
         run: flutter pub get
 
-      # 7️⃣ بناء APK فقط
+      # بناء APK فقط
       - name: Build APK
         run: flutter build apk --release
 
-      # 8️⃣ رفع الـ APK كـ artifact
+      # رفع الـ APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
