@@ -17,24 +17,36 @@ jobs:
       - name: Remove old Flutter
         run: rm -rf $HOME/flutter
 
-      # 3️⃣ تثبيت Flutter من المصدر (يتضمن Dart >=3.3)
+      # 3️⃣ تثبيت Flutter 3.13.0 من GitHub
       - name: Install Flutter 3.13.0
         run: |
           git clone -b 3.13.0 https://github.com/flutter/flutter.git $HOME/flutter
           echo "$HOME/flutter/bin" >> $GITHUB_PATH
-          flutter --version
 
-      # 4️⃣ تنظيف أي ملفات بناء سابقة
+      # 4️⃣ التحقق من النسخة بعد تحديث PATH
+      - name: Check Flutter & Dart version
+        run: |
+          flutter --version
+          dart --version
+
+      # 5️⃣ تنظيف أي ملفات بناء سابقة
       - name: Flutter clean
         run: flutter clean
 
-      # 5️⃣ تثبيت الاعتمادات
+      # 6️⃣ تثبيت الاعتمادات
       - name: Install dependencies
         run: flutter pub get
 
-      # 6️⃣ بناء APK فقط
+      # 7️⃣ بناء APK فقط
       - name: Build APK
         run: flutter build apk --release
+
+      # 8️⃣ رفع الـ APK كـ artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk        run: flutter build apk --release
 
       # 7️⃣ رفع الـ APK كـ artifact
       - name: Upload APK
