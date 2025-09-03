@@ -1,0 +1,46 @@
+name: Build Flutter APK & AAB
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # تنزيل الكود
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # تثبيت Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.13.0'   # غيّرها لإصدارك إذا مختلف
+
+      # تثبيت الحزم
+      - name: Install dependencies
+        run: flutter pub get
+
+      # بناء APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # بناء AAB (App Bundle)
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      # رفع الـ APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # رفع الـ AAB
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: build/app/outputs/bundle/release/app-release.aab
