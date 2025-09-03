@@ -1,40 +1,32 @@
-
 name: Flutter CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          # استخدم إصدار Flutter الذي يتضمن Dart SDK 3.3.0 أو أحدث
-          # Flutter 3.19.0 يأتي مع Dart 3.3.0. تحقق من ملاحظات إصدار Flutter للحصول على أحدث إصدار متوافق.
-          flutter-version: '3.19.0' 
+          flutter-version: '3.22.0'
           channel: 'stable'
-          
-      - name: Get dependencies
+
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests (اختياري)
-        run: flutter test
-
-      - name: Build Android APK (مثال)
+      - name: Build APK
         run: flutter build apk --release
 
-      # يمكنك إضافة خطوات بناء أخرى هنا، مثل:
-      # - name: Build iOS (يتطلب macOS runner)
-      #   if: runner.os == 'macOS'
-      #   run: flutter build ios --release --no-codesign
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
