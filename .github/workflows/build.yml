@@ -1,35 +1,40 @@
-name: Build Flutter APK
+
+name: Flutter CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # تنزيل الكود
-      - name: Checkout source
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # تثبيت Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.0'   # غيّرها لإصدارك إذا مختلف
-
-      # تثبيت الحزم
-      - name: Install dependencies
+          # استخدم إصدار Flutter الذي يتضمن Dart SDK 3.3.0 أو أحدث
+          # Flutter 3.19.0 يأتي مع Dart 3.3.0. تحقق من ملاحظات إصدار Flutter للحصول على أحدث إصدار متوافق.
+          flutter-version: '3.19.0' 
+          channel: 'stable'
+          
+      - name: Get dependencies
         run: flutter pub get
 
-      # بناء APK فقط
-      - name: Build APK
+      - name: Run tests (اختياري)
+        run: flutter test
+
+      - name: Build Android APK (مثال)
         run: flutter build apk --release
 
-      # رفع الـ APK
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+      # يمكنك إضافة خطوات بناء أخرى هنا، مثل:
+      # - name: Build iOS (يتطلب macOS runner)
+      #   if: runner.os == 'macOS'
+      #   run: flutter build ios --release --no-codesign
